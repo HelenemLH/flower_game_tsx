@@ -1,0 +1,83 @@
+.game-container {
+  padding: 16px;
+  text-align: center;
+}
+
+.game-title {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: -50px;
+  color:gray;
+}
+
+.game-status {
+  font-size: 1.25rem;
+  margin-bottom: 19px;
+}
+
+.new-game-button {
+  background-color: hotpink;
+  color: white;
+  padding: 10px 20px;
+  font-size: 1.2rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.new-game-button:hover {
+  background-color:rgb(255, 165, 0);
+}
+
+.guess-prompt {
+  margin-top: 0px;
+  margin-bottom: 16px;
+  font-size: 1.25rem;
+  color: gray;
+}
+
+.game-layout {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.flower-container {
+  display: inline-block;
+}
+
+.word-display {
+  font-size: 1.5rem;
+  margin-left: -5px;
+  margin-top: 175px;
+}
+
+.letter-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.letter-button {
+  padding: 10px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  border-radius: 8px;
+}
+
+.letter-active {
+  background-color: #8e44ad;
+  color: white;
+}
+
+.letter-active:hover {
+  background-color: #6d348c;
+}
+
+.letter-disabled {
+  background-color: #bdc3c7;
+  cursor: not-allowed;
+}
