@@ -25,6 +25,7 @@ function FlowerGame() {
   const maxWrongGuesses = 8;
   const [isGameOver, setIsGameOver] = useState<boolean>(false);
   const [isWinner, setIsWinner] = useState<boolean>(false);
+  const [message, setMessage] = useState<string>("");
 
   const stemRef = useRef<SVGPathElement>(null);
   const petalRefs = useRef<Array<SVGEllipseElement | null>>([]);
@@ -44,6 +45,10 @@ function FlowerGame() {
   }, [guessedLetters, wrongGuessCount, word]);
 
   useEffect(() => {
+    resetAnimation(); // Call resetAnimation when game starts
+  }, []);
+
+  const resetAnimation = () => {
     gsap.fromTo(
       stemRef.current,
       { scaleY: 0 },
@@ -69,13 +74,14 @@ function FlowerGame() {
         }
       );
     });
-  }, []);
+  };
 
   const guessLetter = (letter: string) => {
     if (!guessedLetters.includes(letter)) {
       setGuessedLetters([...guessedLetters, letter]);
       if (!word.includes(letter)) {
         setWrongGuessCount(wrongGuessCount + 1);
+        setMessage("Wrong guess!");
         const petalIndex = wrongGuessCount;
         const petal = petalRefs.current[petalIndex];
         if (petal) {
@@ -88,6 +94,8 @@ function FlowerGame() {
             },
           });
         }
+      } else {
+        setMessage("Correct guess!");
       }
     }
   };
@@ -98,7 +106,9 @@ function FlowerGame() {
     setWrongGuessCount(0);
     setIsGameOver(false);
     setIsWinner(false);
+    setMessage("");
     petalRefs.current = [];
+    resetAnimation(); // Reset animation when starting a new game
   };
 
   const showFlower = () => {
@@ -151,9 +161,7 @@ function FlowerGame() {
   return (
     <div className="game-container">
       {isWinner && <Confetti />}
-
       <h1 className="game-title">Flower Game</h1>
-
       <div className="game-layout">
         <div className="flower-container">{showFlower()}</div>
         <div className="word-display">
@@ -175,7 +183,7 @@ function FlowerGame() {
         </div>
       ) : (
         <>
-          <p className="guess-prompt">Guess a letter!</p>
+          <p className="guess-prompt">{message || "Guess a letter!"}</p>
           <div className="letter-grid">
             {"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((letter) => (
               <button
