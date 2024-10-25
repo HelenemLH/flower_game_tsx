@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { gsap } from "gsap";
 import Confetti from "react-confetti";
 import "./App.css";
 
@@ -23,7 +24,11 @@ function FlowerGame() {
   const [wrongGuessCount, setWrongGuessCount] = useState<number>(0);
   const maxWrongGuesses = 8;
   const [isGameOver, setIsGameOver] = useState<boolean>(false);
-  const [isWinner, setIsWinner] = useState<boolean>(false); // Track win condition
+  const [isWinner, setIsWinner] = useState<boolean>(false);
+
+  const stemRef = useRef<SVGPathElement>(null);
+  const petalRefs = useRef<Array<SVGEllipseElement | null>>([]);
+  const centerRef = useRef<SVGCircleElement>(null);
 
   useEffect(() => {
     const allLettersGuessed = word
@@ -38,11 +43,51 @@ function FlowerGame() {
     }
   }, [guessedLetters, wrongGuessCount, word]);
 
+  useEffect(() => {
+    gsap.fromTo(
+      stemRef.current,
+      { scaleY: 0 },
+      { scaleY: 1, duration: 1, transformOrigin: "top" }
+    );
+
+    gsap.fromTo(
+      centerRef.current,
+      { scale: 0 },
+      { scale: 1, duration: 1, ease: "elastic.out(1, 0.5)" }
+    );
+
+    petalRefs.current.forEach((petal, index) => {
+      gsap.fromTo(
+        petal,
+        { opacity: 0, scale: 0 },
+        {
+          opacity: 1,
+          scale: 1,
+          duration: 1,
+          delay: 0.2 * index,
+          ease: "back.out(1.7)",
+        }
+      );
+    });
+  }, []);
+
   const guessLetter = (letter: string) => {
     if (!guessedLetters.includes(letter)) {
       setGuessedLetters([...guessedLetters, letter]);
       if (!word.includes(letter)) {
         setWrongGuessCount(wrongGuessCount + 1);
+        const petalIndex = wrongGuessCount;
+        const petal = petalRefs.current[petalIndex];
+        if (petal) {
+          gsap.to(petal, {
+            opacity: 0,
+            scale: 0,
+            duration: 0.5,
+            onComplete: () => {
+              petalRefs.current[petalIndex] = null;
+            },
+          });
+        }
       }
     }
   };
@@ -53,6 +98,7 @@ function FlowerGame() {
     setWrongGuessCount(0);
     setIsGameOver(false);
     setIsWinner(false);
+    petalRefs.current = [];
   };
 
   const showFlower = () => {
@@ -68,7 +114,6 @@ function FlowerGame() {
     for (let i = 0; i < petalCount; i++) {
       const angle = (i * 360) / petalCount;
       const radians = (angle * Math.PI) / 180;
-
       const petalX = centerX + radius * Math.cos(radians);
       const petalY = centerY + radius * Math.sin(radians);
 
@@ -80,6 +125,7 @@ function FlowerGame() {
           rx={petalWidth / 2}
           ry={petalHeight / 2}
           fill="#FF69B4"
+          ref={(el) => (petalRefs.current[i] = el)}
           transform={`rotate(${angle}, ${petalX}, ${petalY})`}
         />
       );
@@ -87,19 +133,17 @@ function FlowerGame() {
 
     return (
       <svg width="200" height="250" viewBox="0 0 200 250">
-        <path d="M100 130 L100 230" stroke="green" strokeWidth="4" />
+        <path
+          ref={stemRef}
+          d="M100 130 L100 230"
+          stroke="green"
+          strokeWidth="4"
+        />
         <path d="M100 180 Q70 170 60 190 Q70 210 100 200" fill="green" />
         <path d="M100 200 Q130 180 140 190 Q130 210 100 210" fill="green" />
-        <circle cx="100" cy="130" r="15" fill="#FFD700" />
+        <circle ref={centerRef} cx="100" cy="130" r="15" fill="#FFD700" />
         <circle cx="100" cy="130" r="10" fill="#FFA500" />
-        {wrongGuessCount < 1 && petals[0]}
-        {wrongGuessCount < 2 && petals[1]}
-        {wrongGuessCount < 3 && petals[2]}
-        {wrongGuessCount < 4 && petals[3]}
-        {wrongGuessCount < 5 && petals[4]}
-        {wrongGuessCount < 6 && petals[5]}
-        {wrongGuessCount < 7 && petals[6]}
-        {wrongGuessCount < 8 && petals[7]}
+        {wrongGuessCount < maxWrongGuesses && petals}
       </svg>
     );
   };
