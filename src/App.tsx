@@ -14,6 +14,8 @@ function getRandomWord() {
     "tree",
     "ocean",
     "mountain",
+    "animal",
+    "cat",
   ];
   return words[Math.floor(Math.random() * words.length)].toUpperCase();
 }
