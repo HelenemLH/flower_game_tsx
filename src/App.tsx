@@ -9,13 +9,21 @@ function getRandomWord() {
     "blossom",
     "nature",
     "garden",
-    "flowers",
+    "flower",
     "green",
     "tree",
     "ocean",
     "mountain",
     "animal",
     "cat",
+    "plant",
+    "sky",
+    "fauna",
+    "forest",
+    "jungle",
+    "root",
+    "earth",
+    "organism",
   ];
   return words[Math.floor(Math.random() * words.length)].toUpperCase();
 }
